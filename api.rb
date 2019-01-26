@@ -2,16 +2,21 @@ require 'sinatra'
 require 'json'
 require 'neo4j-core'
 require 'neo4j/core/cypher_session/adaptors/http'
-require 'neo4j/core/cypher_session/adaptors/bolt'
 
 NEO4J_URL = ENV['NEO4J_URL'] || 'http://localhost:7474'
 
 Neo4j::Core::CypherSession::Adaptors::Base.subscribe_to_query(&method(:puts))
 
 def get_session
-    adaptor_class = NEO4J_URL.match(/^bolt:/) ? Neo4j::Core::CypherSession::Adaptors::Bolt : Neo4j::Core::CypherSession::Adaptors::HTTP
+    faraday_configurator = proc do |faraday|
+        faraday.adapter :typhoeus
 
-    Neo4j::Core::CypherSession.new(adaptor_class.new(NEO4J_URL))
+        puts faraday.options.inspect
+        faraday.ssl[:verify] = false
+    end
+
+    http_adaptor = Neo4j::Core::CypherSession::Adaptors::HTTP.new(NEO4J_URL, faraday_configurator: faraday_configurator)
+    Neo4j::Core::CypherSession.new(http_adaptor)
 end
 
 before do
