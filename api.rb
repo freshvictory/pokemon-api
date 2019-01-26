@@ -22,7 +22,7 @@ end
 before do
     content_type :json
     headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    headers['Access-Control-Allow-Origin'] = 'http://localhost:4455'
+    headers['Access-Control-Allow-Origin'] = 'http://localhost:4455,https://pokemon-type-app.netlify.com'
     headers['Access-Control-Allow-Headers'] = 'accept, authorization, origin'
 end
 
